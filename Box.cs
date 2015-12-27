@@ -93,41 +93,78 @@ namespace RacunarskaGrafika.Vezbe
         {
             Gl.glBegin(Gl.GL_QUADS);
 
+            float num1 = this.m_width > this.m_depth ? (float)this.m_width : (float)this.m_depth;
+            float num2 = this.m_width > this.m_height ? (float)this.m_width : (float)this.m_height;
+            float num3 = this.m_depth > this.m_height ? (float)this.m_depth : (float)this.m_height;
+
             // Zadnja
-            Gl.glVertex3d(-m_width / 2, -m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(m_width / 2, m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(m_width / 2, -m_height / 2, -m_depth / 2);
+            Gl.glNormal3f(0.0f, 0.0f, -1f);
+            Gl.glTexCoord2f((float)this.m_width / num2, 0.0f);
+            Gl.glVertex3d(this.m_width / 2.0, -this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, 0.0f);
+            Gl.glVertex3d(-this.m_width / 2.0, -this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, (float)this.m_height / num2);
+            Gl.glVertex3d(-this.m_width / 2.0, this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_width / num2, (float)this.m_height / num2);
+            Gl.glVertex3d(this.m_width / 2.0, this.m_height / 2.0, -this.m_depth / 2.0);
+
 
             // Desna
-            Gl.glVertex3d(m_width / 2, -m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(m_width / 2, m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(m_width / 2, m_height / 2, m_depth / 2);
-            Gl.glVertex3d(m_width / 2, -m_height / 2, m_depth / 2);
+            Gl.glNormal3f(1f, 0.0f, 0.0f);
+            Gl.glTexCoord2f(0.0f, 0.0f);
+            Gl.glVertex3d(this.m_width / 2.0, -this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_height / num3, 0.0f);
+            Gl.glVertex3d(this.m_width / 2.0, this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_height / num3, (float)this.m_depth / num3);
+            Gl.glVertex3d(this.m_width / 2.0, this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, (float)this.m_depth / num3);
+            Gl.glVertex3d(this.m_width / 2.0, -this.m_height / 2.0, this.m_depth / 2.0);
+
 
             // Prednja
-            Gl.glVertex3d(m_width / 2, -m_height / 2, m_depth / 2);
-            Gl.glVertex3d(m_width / 2, m_height / 2, m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, m_height / 2, m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, -m_height / 2, m_depth / 2);
+            Gl.glNormal3f(0.0f, 0.0f, 1f);
+            Gl.glTexCoord2f((float)this.m_width / num2, 0.0f);
+            Gl.glVertex3d(this.m_width / 2.0, -this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_width / num2, (float)this.m_height / num3);
+            Gl.glVertex3d(this.m_width / 2.0, this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, (float)this.m_height / num3);
+            Gl.glVertex3d(-this.m_width / 2.0, this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, 0.0f);
+            Gl.glVertex3d(-this.m_width / 2.0, -this.m_height / 2.0, this.m_depth / 2.0);
+
 
             // Leva
-            Gl.glVertex3d(-m_width / 2, -m_height / 2, m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, m_height / 2, m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, -m_height / 2, -m_depth / 2);
+            Gl.glNormal3f(-1f, 0.0f, 0.0f);
+            Gl.glTexCoord2f(0.0f, (float)this.m_depth / num3);
+            Gl.glVertex3d(-this.m_width / 2.0, -this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_height / num3, (float)this.m_depth / num3);
+            Gl.glVertex3d(-this.m_width / 2.0, this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_height / num3, 0.0f);
+            Gl.glVertex3d(-this.m_width / 2.0, this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, 0.0f);
+            Gl.glVertex3d(-this.m_width / 2.0, -this.m_height / 2.0, -this.m_depth / 2.0);
 
             // Donja
-            Gl.glVertex3d(-m_width / 2, -m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(m_width / 2, -m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(m_width / 2, -m_height / 2, m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, -m_height / 2, m_depth / 2);
+            Gl.glNormal3f(0.0f, -1f, 0.0f);
+            Gl.glTexCoord2f(0.0f, 0.0f);
+            Gl.glVertex3d(-this.m_width / 2.0, -this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_width / num1, 0.0f);
+            Gl.glVertex3d(this.m_width / 2.0, -this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_width / num1, (float)this.m_depth / num1);
+            Gl.glVertex3d(this.m_width / 2.0, -this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, (float)this.m_depth / num1);
+            Gl.glVertex3d(-this.m_width / 2.0, -this.m_height / 2.0, this.m_depth / 2.0);
 
             // Gornja
-            Gl.glVertex3d(-m_width / 2, m_height / 2, -m_depth / 2);
-            Gl.glVertex3d(-m_width / 2, m_height / 2, m_depth / 2);
-            Gl.glVertex3d(m_width / 2, m_height / 2, m_depth / 2);
-            Gl.glVertex3d(m_width / 2, m_height / 2, -m_depth / 2);
+            Gl.glNormal3f(0.0f, 1f, 0.0f);
+            Gl.glTexCoord2f(0.0f, 0.0f);
+            Gl.glVertex3d(-this.m_width / 2.0, this.m_height / 2.0, -this.m_depth / 2.0);
+            Gl.glTexCoord2f(0.0f, (float)this.m_depth / num1);
+            Gl.glVertex3d(-this.m_width / 2.0, this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_width / num1, (float)this.m_depth / num1);
+            Gl.glVertex3d(this.m_width / 2.0, this.m_height / 2.0, this.m_depth / 2.0);
+            Gl.glTexCoord2f((float)this.m_width / num1, 0.0f);
+            Gl.glVertex3d(this.m_width / 2.0, this.m_height / 2.0, -this.m_depth / 2.0);
 
             Gl.glEnd();
         }

@@ -2,19 +2,41 @@
 using RacunarskaGrafika.Vezbe.AssimpNetSample;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 using Tao.OpenGl;
 
 namespace Projekat
 {
-    public class World
+    public class World : IDisposable
     {
+
+        /// <summary>
+        ///	 Identifikatori OpenGL tekstura
+        /// </summary>
+        static int[] textures = null;
+
+        /// <summary>
+        ///	 Putanje do slika koje se koriste za teksture
+        /// </summary>
+        static string[] textureFiles = { "..//..//textures//asphalt.jpg", "..//..//textures//dirt.jpg" };
+
+
+        /// <summary>
+        ///	 Identifikatori tekstura za jednostavniji pristup teksturama
+        /// </summary>
+        private enum TextureObjects { Asphalt = 0, Dirt };
+        private readonly int textureCount = Enum.GetNames(typeof(TextureObjects)).Length;
 
         // Box klasa
         private Box mf_box = null;
 
         //sijalice na pisti, 30 komada
         public List<Glu.GLUquadric> mf_sijalice;
+
+        //objekat koji predstavlja izvor svetlosti
+        //koristen za debagovanje
         public Glu.GLUquadric light_source;
         //asimp scena
         private AssimpScene mf_scene;
@@ -94,6 +116,14 @@ namespace Projekat
                 MessageBox.Show("Neuspesno kreirana instanca klase BOX", "GRESKA", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+            try
+            {
+                textures = new int[textureCount];
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Neuspesno kreirana niz identifikatora za teksture", "GRESKA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             this.Initialize();
             this.Resize();
         }
@@ -118,6 +148,9 @@ namespace Projekat
             Gl.glViewport(0, 0, mf_width, mf_height);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
+
+            Bitmap image;  // promenljiva u koju ucitavamo sadrzaj slike
+
             //fov 60, near 1.5, far 30
             Glu.gluPerspective(60.0, (double)mf_width / (double)mf_height, 1.5, 30.0);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
@@ -143,11 +176,7 @@ namespace Projekat
 
             }
             Gl.glPopMatrix();
-            //pozicija svetla
-            //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_pos);
-
-            //boja svetla
-            //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, new float[] { 0, 1, 0, 1 });
+         
 
             
         }
@@ -157,13 +186,15 @@ namespace Projekat
 
             float[] ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
             float[] diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-            float[] ambiental = { 0.2f, 0.2f, 0.2f, 1.0f };
+            float[] ambiental = { 0.5f, 0.5f, 0.5f, 1.0f };
+            Bitmap image;  // promenljiva u koju ucitavamo sadrzaj slike
 
             Gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             Gl.glEnable(Gl.GL_DEPTH_TEST);
             Gl.glEnable(Gl.GL_CULL_FACE);
+            Gl.glLoadIdentity();
 
 
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, ambient);
@@ -181,7 +212,45 @@ namespace Projekat
             Gl.glEnable(Gl.GL_COLOR_MATERIAL);
             Gl.glColorMaterial(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE);
 
-            Gl.glLoadIdentity();
+
+            //teksture
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
+            Gl.glTexEnvi(Gl.GL_TEXTURE_ENV, Gl.GL_TEXTURE_ENV_MODE, Gl.GL_MODULATE);
+            
+            // Ucitaj slike i kreiraj teksture
+            Gl.glGenTextures(textureCount, textures);
+
+
+            for (int i = 0; i < textureCount; ++i)
+            {
+                // Pridruzi teksturu odgovarajucem identifikatoru
+                Gl.glBindTexture(Gl.GL_TEXTURE_2D, textures[i]);
+
+                // Ucitaj sliku i podesi parametre teksture
+                image = new Bitmap(textureFiles[i]);
+                // rotiramo sliku zbog koordinantog sistema opengl-a
+                image.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                Rectangle rect = new Rectangle(0, 0, image.Width, image.Height);
+                // RGBA format (dozvoljena providnost slike tj. alfa kanal)
+                BitmapData imageData = image.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                                                      PixelFormat.Format32bppArgb);
+
+                Glu.gluBuild2DMipmaps(Gl.GL_TEXTURE_2D, Gl.GL_RGBA8, image.Width, image.Height, Gl.GL_BGRA, Gl.GL_UNSIGNED_BYTE, imageData.Scan0);
+
+                // TODO 1: Podesiti texture filtre: max = linear, min=linear_mipmap_linear,
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR_MIPMAP_LINEAR);
+
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, Gl.GL_REPEAT);
+                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, Gl.GL_REPEAT);
+
+                image.UnlockBits(imageData);
+                image.Dispose();
+            }
+
+
+
+            
 
 
             //inicijalizacija 30 sijalica
@@ -190,6 +259,7 @@ namespace Projekat
             for (int i = 0; i < broj_sijalica; i++)
             {
                 Glu.GLUquadric tmp = Glu.gluNewQuadric();
+                Glu.gluQuadricTexture(tmp, Gl.GL_TRUE);
                 Glu.gluQuadricNormals(tmp, Glu.GLU_SMOOTH);
                 mf_sijalice.Add(tmp);
                 
@@ -243,15 +313,16 @@ namespace Projekat
             }
             Gl.glPopMatrix();
 
-            // Podloga nacrana Box klasom
+            // pista nacrana Box klasom
             Gl.glPushMatrix();
             {
+                //normale definisane u box klasi
+                Gl.glBindTexture(Gl.GL_TEXTURE_2D, textures[(int)TextureObjects.Asphalt]);
                 Gl.glColor3ub(193, 193, 164);
-                //definisana normala
-                Gl.glNormal3f(0, 1, 0);
                 Gl.glScalef(2.5f, 0.1f, 15f);
                 Gl.glTranslatef(0f, -9.1f, -0.5f);
                 mf_box.Draw();
+                //Gl.glDisable(Gl.GL_TEXTURE_2D);
             }
             Gl.glPopMatrix();
 
@@ -341,7 +412,7 @@ namespace Projekat
             Glu.gluPerspective(60.0, (double)mf_width / (double)mf_height, 1.5, 30.0);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
-
+            //Gl.glDisable(Gl.GL_TEXTURE_2D);
 
             Gl.glFlush();
             
