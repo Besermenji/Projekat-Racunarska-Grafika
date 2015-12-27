@@ -15,7 +15,7 @@ namespace Projekat
 
         //sijalice na pisti, 30 komada
         public List<Glu.GLUquadric> mf_sijalice;
-
+        public Glu.GLUquadric light_source;
         //asimp scena
         private AssimpScene mf_scene;
         public AssimpScene Scene
@@ -114,16 +114,66 @@ namespace Projekat
             //fov 60, near 1.5, far 30
             Glu.gluPerspective(60.0, (double)mf_width / (double)mf_height, 1.5, 30.0);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            
             Gl.glLoadIdentity();
+            turnOnLights();
+            
+
+          
+        }
+
+        private void turnOnLights() {
+            float[] light_pos = { 0f, 3f, -12f, 1f };
+            float[] light_color = { 0, 0, 0, 1 };
+
+
+            Gl.glPushMatrix();
+            {
+                Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_pos);
+                Gl.glTranslatef(light_pos[0], light_pos[1], light_pos[2]);
+                //Glu.gluSphere(light_source, 0.5f, 64, 64);
+                //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
+
+            }
+            Gl.glPopMatrix();
+            //pozicija svetla
+            //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_pos);
+
+            //boja svetla
+            //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, new float[] { 0, 1, 0, 1 });
+
+            
         }
 
         private void Initialize()
         {
+
+            float[] ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
+            float[] diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+            float[] ambiental = { 0.2f, 0.2f, 0.2f, 1.0f };
+
             Gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             Gl.glEnable(Gl.GL_DEPTH_TEST);
             Gl.glEnable(Gl.GL_CULL_FACE);
+
+
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, ambient);
+            Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, diffuse);
+            //cut-off 30
+            Gl.glLightf(Gl.GL_LIGHT0, Gl.GL_SPOT_CUTOFF, 30f);
+
+            //ukljucivanje svetla i normalizacije
+            Gl.glEnable(Gl.GL_LIGHTING);
+            Gl.glEnable(Gl.GL_LIGHT0);
+            Gl.glEnable(Gl.GL_NORMALIZE);
+
+
+            //color tracking
+            Gl.glEnable(Gl.GL_COLOR_MATERIAL);
+            Gl.glColorMaterial(Gl.GL_FRONT, Gl.GL_AMBIENT_AND_DIFFUSE);
+
             Gl.glLoadIdentity();
 
 
@@ -137,18 +187,33 @@ namespace Projekat
                 mf_sijalice.Add(tmp);
                 
             }
+            light_source = Glu.gluNewQuadric();
+            Glu.gluQuadricNormals(light_source, Glu.GLU_SMOOTH);
+
+            
 
         }
 
         public void Draw()
         {
             Gl.glClear(16640);
+            turnOnLights();
             Gl.glPushMatrix();
+            
+            //float[] white_color = { 1f, 1f, 1f, 1f };
+            //float[] light_pos = { 1.5f, 1.5f, 1.0f, 15.0f };
+
+            //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_pos);
+
 
             // Primeni transformacije nad svetom
-            Gl.glTranslatef(0.0f, 0.0f, -2.5f);
+            Gl.glTranslatef(0.0f, 0.0f, -3.5f);
             Gl.glRotatef(mf_xRotation, 1.0f, 0.0f, 0.0f);
             Gl.glRotatef(mf_yRotation, 0.0f, 1.0f, 0.0f);
+
+            
+            
+
 
             // Podloga nacrtana sa gl quads
             Gl.glPushMatrix();
@@ -159,10 +224,14 @@ namespace Projekat
                 Gl.glColor3ub(61, 61, 41);
 
                 Gl.glBegin(Gl.GL_QUADS);
-                Gl.glVertex3f(0f, 0f, 0.0f); // The bottom left corner  
-                Gl.glVertex3f(1.0f, 0f, 0.0f); // The top left corner  
-                Gl.glVertex3f(1.0f, 0f, -1.0f); // The top right corner  
-                Gl.glVertex3f(0f, 0f, -1.0f); //
+                {
+                    //definisana normala
+                    Gl.glNormal3f(0, 1, 0);
+                    Gl.glVertex3f(0f, 0f, 0.0f);
+                    Gl.glVertex3f(1.0f, 0f, 0.0f);
+                    Gl.glVertex3f(1.0f, 0f, -1.0f);
+                    Gl.glVertex3f(0f, 0f, -1.0f);
+                }
                 Gl.glEnd();
             }
             Gl.glPopMatrix();
@@ -171,6 +240,8 @@ namespace Projekat
             Gl.glPushMatrix();
             {
                 Gl.glColor3ub(193, 193, 164);
+                //definisana normala
+                Gl.glNormal3f(0, 1, 0);
                 Gl.glScalef(2.5f, 0.1f, 15f);
                 Gl.glTranslatef(0f, -9.1f, -0.5f);
                 mf_box.Draw();
@@ -180,6 +251,9 @@ namespace Projekat
 
             //crtanje sijalica na pisti
             Gl.glColor3ub(255, 255, 77);
+            float x_sijalice = 1.35f;
+            float y_sijalice = -.95f;
+
             for (int i = 0; i < mf_sijalice.Count; i++)
             {
                 Gl.glPushMatrix();
@@ -190,17 +264,20 @@ namespace Projekat
                 {
 
                     {
-                        Gl.glTranslatef(1f, -0.85f, -(float)daljina);
+                        Gl.glTranslatef(x_sijalice, y_sijalice, -(float)daljina);
 
 
                     }
-
+                    
                 }
                 else {
-                    Gl.glTranslatef(-1f, -0.85f, -(float)daljina);
+                    Gl.glTranslatef(-x_sijalice, y_sijalice, -(float)daljina);
                 }
 
-                Glu.gluSphere(mf_sijalice[0], 0.05f, 64, 64);
+                Glu.gluSphere(mf_sijalice[i], 0.05f, 64, 64);
+                
+                    
+
                 Gl.glPopMatrix();
             }
 
@@ -239,7 +316,7 @@ namespace Projekat
                 for (int i = 0; i < message.Length; i++)
                 {
                     
-                    Gl.glRasterPos2f(-mf_width / 2.0f, mf_height / 2.0f - mf_font.Height * (i + 1) - 0.5f);
+                    Gl.glRasterPos2f(-mf_width / 2.0f, mf_height / 2.0f - mf_font.Height * (i + 1) - 1.5f);
                     mf_font.DrawText(message[i]);
 
                 }
@@ -250,8 +327,17 @@ namespace Projekat
 
                 Gl.glPopMatrix();
             }
+            Gl.glViewport(0, 0, mf_width, mf_height);
+            Gl.glMatrixMode(Gl.GL_PROJECTION);
+            Gl.glLoadIdentity();
+            //fov 60, near 1.5, far 30
+            Glu.gluPerspective(60.0, (double)mf_width / (double)mf_height, 1.5, 30.0);
+            Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            Gl.glLoadIdentity();
+
+
             Gl.glFlush();
-            Resize();
+            
 
         }
     }
