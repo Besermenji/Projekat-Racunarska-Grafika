@@ -52,16 +52,64 @@ namespace Projekat
 
         private void canvas_KeyDown(object sender, KeyEventArgs e)
         {
+
+            int maxDistance = 21;
             switch (e.KeyCode)
             {
-                case Keys.F10: this.Close(); break;
-                case Keys.W: world.RotationX -= 5.0f; break;
-                case Keys.S: world.RotationX += 5.0f; break;
-                case Keys.A: world.RotationY -= 5.0f; break;
-                case Keys.D: world.RotationY += 5.0f; break;
+                case Keys.F2: this.Close(); break;
+                case Keys.W: world.RotationX -= 4.0f; break;
+                case Keys.S: world.RotationX += 4.0f; break;
+                case Keys.A: world.RotationY -= 4.0f; break;
+                case Keys.D: world.RotationY += 4.0f; break;
+                case Keys.Subtract: {
+                      
+                            world.cameraControl -= .3f;
+                       
+
+                        break; }
+                case Keys.OemMinus:
+                    {
+
+                        world.cameraControl -= .3f;
+
+
+                        break;
+                    }
+                case Keys.Oemplus:
+                    {
+
+                        world.cameraControl += .3f;
+
+
+                        break;
+                    }
+                case Keys.Add:
+                    {
+                        
+                        world.cameraControl += .3f;
+
+
+                        break;
+                    }
+
+
             }
 
             this.Refresh();
+        }
+
+        private void colorButton_Click(object sender, EventArgs e)
+        {
+            ColorDialog cd = new ColorDialog();
+            
+            if (cd.ShowDialog() == DialogResult.OK)
+            {
+                world.light_red = cd.Color.R;
+                world.light_green = cd.Color.G;
+                world.light_blue = cd.Color.B;
+                this.Refresh();
+                //MessageBox.Show("RED: " + red);
+            }
         }
     }
 }

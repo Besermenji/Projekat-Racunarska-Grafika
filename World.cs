@@ -12,6 +12,15 @@ namespace Projekat
     public class World : IDisposable
     {
 
+        //sijalica crveno
+        public byte light_red { get; set; }
+        //sijalica zeleno
+        public byte light_green { get; set; }
+        //sijalica plavo
+        public byte light_blue { get; set; }
+
+
+
         /// <summary>
         ///	 Identifikatori OpenGL tekstura
         /// </summary>
@@ -58,8 +67,8 @@ namespace Projekat
 
        
         private float mf_xRotation = 15.0f;
+        internal float cameraControl;
 
-        
         public float RotationY
         {
             get { return mf_yRotation; }
@@ -184,6 +193,14 @@ namespace Projekat
         private void Initialize()
         {
 
+            //yellow lights
+            light_red = 255;
+            light_green = 255;
+            light_blue = 77;
+
+            //camera + -
+            cameraControl = -5;
+
             float[] ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
             float[] diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
             float[] ambiental = { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -276,15 +293,17 @@ namespace Projekat
             Gl.glClear(16640);
             turnOnLights();
             Gl.glPushMatrix();
-            
-            //float[] white_color = { 1f, 1f, 1f, 1f };
-            //float[] light_pos = { 1.5f, 1.5f, 1.0f, 15.0f };
 
-            //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_pos);
+
+            //kamera
+            Glu.gluLookAt(2.0f, 3.0f, cameraControl, //pogled sa kamere
+                0.0f, 0.0f, 0.0f, 
+                0.0f, 1.0f, 0.0f);
+
 
 
             // Primeni transformacije nad svetom
-            Gl.glTranslatef(0.0f, 0.0f, -3.5f);
+            Gl.glTranslatef(0.0f, 0.0f, 1f);
             Gl.glRotatef(mf_xRotation, 1.0f, 0.0f, 0.0f);
             Gl.glRotatef(mf_yRotation, 0.0f, 1.0f, 0.0f);
 
@@ -295,21 +314,38 @@ namespace Projekat
             // Podloga nacrtana sa gl quads
             Gl.glPushMatrix();
             {
-                Gl.glScalef(4f, 0.5f, 15f);
-                Gl.glTranslatef(-0.5f, -2f, 0f);
+                
 
                 Gl.glColor3ub(61, 61, 41);
-
-                Gl.glBegin(Gl.GL_QUADS);
+                Gl.glBindTexture(Gl.GL_TEXTURE_2D, textures[(int)TextureObjects.Dirt]);
+                Gl.glMatrixMode(Gl.GL_TEXTURE);
+                Gl.glPushMatrix();
                 {
-                    //definisana normala
-                    Gl.glNormal3f(0, 1, 0);
-                    Gl.glVertex3f(0f, 0f, 0.0f);
-                    Gl.glVertex3f(1.0f, 0f, 0.0f);
-                    Gl.glVertex3f(1.0f, 0f, -1.0f);
-                    Gl.glVertex3f(0f, 0f, -1.0f);
+                    Gl.glScalef(10f, 10f, 1f);
+                    //Gl.glTranslatef(-0.5f, -2f, 0f);
+
+                    Gl.glMatrixMode(Gl.GL_MODELVIEW);
+                    Gl.glScalef(4f, 0.5f, 15f);
+                    Gl.glTranslatef(-0.5f, -2f, 0f);
+                    Gl.glBegin(Gl.GL_QUADS);
+                    {
+                        //definisana normala
+                        Gl.glNormal3f(0, 1, 0);
+                        Gl.glTexCoord2f(1.0f, 1.0f);
+                        Gl.glVertex3f(0f, 0f, 0.0f);
+                        Gl.glTexCoord2f(1.0f, 0.0f);
+                        Gl.glVertex3f(1.0f, 0f, 0.0f);
+                        Gl.glTexCoord2f(0.0f, 0.0f);
+                        Gl.glVertex3f(1.0f, 0f, -1.0f);
+                        Gl.glTexCoord2f(0.0f, 1.0f);
+                        Gl.glVertex3f(0f, 0f, -1.0f);
+                    }
+                    Gl.glEnd();
+                    Gl.glMatrixMode(Gl.GL_TEXTURE);
                 }
-                Gl.glEnd();
+                Gl.glPopMatrix();
+                Gl.glMatrixMode(Gl.GL_MODELVIEW);
+
             }
             Gl.glPopMatrix();
 
@@ -328,7 +364,7 @@ namespace Projekat
 
 
             //crtanje sijalica na pisti
-            Gl.glColor3ub(255, 255, 77);
+            Gl.glColor3ub(light_red, light_green, light_blue);
             float x_sijalice = 1.35f;
             float y_sijalice = -.95f;
 
@@ -370,12 +406,19 @@ namespace Projekat
             }
             Gl.glPopMatrix();
 
-            String[] message = new string[5]{
+            String[] message = new string[]{
                 "Predmet:       Racunarska grafika",
                 "Sk.god:        2014/15",
                 "Ime:           Vladimir",
                 "Prezime:       Besermenji",
-                "Sifra zad:     6.2"
+                "Sifra zad:     6.2",
+                "",
+                "X rotation "+ mf_xRotation,
+                "",
+                "Y rotation "+ mf_yRotation,
+                "",
+                "ZOOM: "+ cameraControl
+
               };
             //crtanje teksta
             
@@ -448,6 +491,8 @@ namespace Projekat
             }
             Glu.gluDeleteQuadric(light_source);
             //Gl.glDeleteLists(m_treeDL, 1);
+            //Gl.glDeleteTextures(textureCount, textures);
+
         }
 
         #endregion IDisposable metode
