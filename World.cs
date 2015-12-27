@@ -97,14 +97,21 @@ namespace Projekat
             this.Initialize();
             this.Resize();
         }
-        ~World() {
-            for (int i = 0; i < mf_sijalice.Count; i++) {
-                Glu.gluDeleteQuadric(this.mf_sijalice[i]);
-
-            }
-
+        /// <summary>
+        ///  Dispose metoda.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
             GC.SuppressFinalize(this);
+        }
 
+        /// <summary>
+        ///  Destruktor.
+        /// </summary>
+        ~World()
+        {
+            this.Dispose(false);
         }
 
         public void Resize() {
@@ -340,5 +347,39 @@ namespace Projekat
             
 
         }
+
+
+        #region IDisposable metode
+
+        /// <summary>
+        ///  Implementacija IDisposable interfejsa.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            //if (disposing)
+            //{
+            //  // Oslodi managed resurse
+            //}
+
+            // Oslobodi OpenGL resurse
+            Terminate();
+        }
+
+        /// <summary>
+        ///  Korisnicko oslobadjanje OpenGL resursa.
+        /// </summary>
+        private void Terminate()
+        {
+            // Oslobodi alocirane identifikatore DL liste i VBO objekta
+            for (int i = 0; i < mf_sijalice.Count; i++)
+            {
+                Glu.gluDeleteQuadric(mf_sijalice[i]);
+            }
+            Glu.gluDeleteQuadric(light_source);
+            //Gl.glDeleteLists(m_treeDL, 1);
+        }
+
+        #endregion IDisposable metode
+
     }
 }
