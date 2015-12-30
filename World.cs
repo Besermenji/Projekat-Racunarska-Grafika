@@ -19,7 +19,7 @@ namespace Projekat
         //sijalica plavo
         public byte light_blue { get; set; }
 
-
+        public float current_daljina = 5;
 
         /// <summary>
         ///	 Identifikatori OpenGL tekstura
@@ -62,12 +62,13 @@ namespace Projekat
 
         private int mf_width;
         private int mf_height;
-        
+
         private float mf_yRotation = 0.0f;
 
-       
+
         private float mf_xRotation = 15.0f;
         internal float cameraControl;
+        public bool lights_enabled { get; set; }
 
         public float RotationY
         {
@@ -104,14 +105,14 @@ namespace Projekat
         public World(string path, string file_name, int width, int height)
         {
 
-            
+
 
 
             //setovanje visine i sirine za resize
             this.mf_width = width;
             this.mf_height = height;
 
-            
+
 
 
             try
@@ -153,46 +154,50 @@ namespace Projekat
             this.Dispose(false);
         }
 
-        public void Resize() {
+        public void Resize()
+        {
             Gl.glViewport(0, 0, mf_width, mf_height);
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
 
-            Bitmap image;  // promenljiva u koju ucitavamo sadrzaj slike
+            Bitmap image;  // promenljiva u koju ucitavamo sararzaj slike
 
             //fov 60, near 1.5, far 30
             Glu.gluPerspective(60.0, (double)mf_width / (double)mf_height, 1.5, 30.0);
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
-            
+
             Gl.glLoadIdentity();
             turnOnLights();
-            
 
-          
+
+
+
         }
 
-        private void turnOnLights() {
-            float[] light_pos = { 0f, 3f, -12f, 1f };
-            float[] light_color = { 0, 0, 0, 1 };
+        private void turnOnLights()
+        {
+            float[] light_pos = { 0f, 3f, -14f, 1f };
+            float[] light_color = { 0, 0, 0, 0 };
 
 
             Gl.glPushMatrix();
             {
                 Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_pos);
                 Gl.glTranslatef(light_pos[0], light_pos[1], light_pos[2]);
-                //Glu.gluSphere(light_source, 0.5f, 64, 64);
-                //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
+
+                Glu.gluSphere(light_source, 0.5f, 64, 64);
+                Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
 
             }
             Gl.glPopMatrix();
-         
 
-            
+
+
         }
 
         private void Initialize()
         {
-
+            lights_enabled = false;
             //yellow lights
             light_red = 255;
             light_green = 255;
@@ -201,27 +206,32 @@ namespace Projekat
             //camera + -
             cameraControl = -5;
 
-            float[] ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
+            float[] ambient = { 0.2f, 0.2f, 0.2f, 1.0f };
             float[] diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-            float[] ambiental = { 0.5f, 0.5f, 0.5f, 1.0f };
+            //float[] ambiental = { 0.5f, 0.5f, 0.5f, 1.0f };
             Bitmap image;  // promenljiva u koju ucitavamo sadrzaj slike
 
             Gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            
+
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             Gl.glEnable(Gl.GL_DEPTH_TEST);
             Gl.glEnable(Gl.GL_CULL_FACE);
             Gl.glLoadIdentity();
 
+            Gl.glLightModelfv(Gl.GL_LIGHT_MODEL_AMBIENT, ambient);
 
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, ambient);
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, diffuse);
             //cut-off 30
             Gl.glLightf(Gl.GL_LIGHT0, Gl.GL_SPOT_CUTOFF, 30f);
 
+
+
+
             //ukljucivanje svetla i normalizacije
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glEnable(Gl.GL_LIGHT0);
+            //Gl.glEnable(Gl.GL_LIGHT1);
             Gl.glEnable(Gl.GL_NORMALIZE);
 
 
@@ -233,7 +243,7 @@ namespace Projekat
             //teksture
             Gl.glEnable(Gl.GL_TEXTURE_2D);
             Gl.glTexEnvi(Gl.GL_TEXTURE_ENV, Gl.GL_TEXTURE_ENV_MODE, Gl.GL_MODULATE);
-            
+
             // Ucitaj slike i kreiraj teksture
             Gl.glGenTextures(textureCount, textures);
 
@@ -267,7 +277,7 @@ namespace Projekat
 
 
 
-            
+
 
 
             //inicijalizacija 30 sijalica
@@ -279,12 +289,12 @@ namespace Projekat
                 Glu.gluQuadricTexture(tmp, Gl.GL_TRUE);
                 Glu.gluQuadricNormals(tmp, Glu.GLU_SMOOTH);
                 mf_sijalice.Add(tmp);
-                
+
             }
             light_source = Glu.gluNewQuadric();
             Glu.gluQuadricNormals(light_source, Glu.GLU_SMOOTH);
 
-            
+
 
         }
 
@@ -297,7 +307,7 @@ namespace Projekat
 
             //kamera
             Glu.gluLookAt(2.0f, 3.0f, cameraControl, //pogled sa kamere
-                0.0f, 0.0f, 0.0f, 
+                0.0f, 0.0f, 0.0f,
                 0.0f, 1.0f, 0.0f);
 
 
@@ -307,14 +317,14 @@ namespace Projekat
             Gl.glRotatef(mf_xRotation, 1.0f, 0.0f, 0.0f);
             Gl.glRotatef(mf_yRotation, 0.0f, 1.0f, 0.0f);
 
-            
-            
+
+
 
 
             // Podloga nacrtana sa gl quads
             Gl.glPushMatrix();
             {
-                
+
 
                 Gl.glColor3ub(61, 61, 41);
                 Gl.glBindTexture(Gl.GL_TEXTURE_2D, textures[(int)TextureObjects.Dirt]);
@@ -362,39 +372,7 @@ namespace Projekat
             }
             Gl.glPopMatrix();
 
-
-            //crtanje sijalica na pisti
-            Gl.glColor3ub(light_red, light_green, light_blue);
-            float x_sijalice = 1.35f;
-            float y_sijalice = -.95f;
-
-            for (int i = 0; i < mf_sijalice.Count; i++)
-            {
-                Gl.glPushMatrix();
-
-                double daljina = Math.Floor((double)i / 2);
-
-                if (i % 2 == 0)
-                {
-
-                    {
-                        Gl.glTranslatef(x_sijalice, y_sijalice, -(float)daljina);
-
-
-                    }
-                    
-                }
-                else {
-                    Gl.glTranslatef(-x_sijalice, y_sijalice, -(float)daljina);
-                }
-
-                Glu.gluSphere(mf_sijalice[i], 0.05f, 64, 64);
-                
-                    
-
-                Gl.glPopMatrix();
-            }
-
+            drawLights();
 
             //crtanje aviona
             Gl.glPushMatrix();
@@ -421,7 +399,7 @@ namespace Projekat
 
               };
             //crtanje teksta
-            
+
             Gl.glPopMatrix();
             Gl.glPushMatrix();
             {
@@ -433,10 +411,10 @@ namespace Projekat
                 Glu.gluOrtho2D(-mf_width / 2.0, mf_width / 2.0, -mf_height / 2.0, mf_height / 2.0);
                 Gl.glMatrixMode(Gl.GL_MODELVIEW);
                 Gl.glColor3ub(0, 0, 255);
-                
+
                 for (int i = 0; i < message.Length; i++)
                 {
-                    
+
                     Gl.glRasterPos2f(-mf_width / 2.0f, mf_height / 2.0f - mf_font.Height * (i + 1) - 1.5f);
                     mf_font.DrawText(message[i]);
 
@@ -458,7 +436,131 @@ namespace Projekat
             //Gl.glDisable(Gl.GL_TEXTURE_2D);
 
             Gl.glFlush();
-            
+
+
+        }
+
+
+        private void setupLightsLights()
+        {
+
+
+        }
+
+
+        private void drawLights()
+        {
+
+            float[] ambient = { 0, 0, 0, 1 };
+            float[] light_color = { light_red, light_green, light_blue, 1 };
+
+            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_AMBIENT, ambient);
+            Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_DIFFUSE, light_color);
+            //Gl.glLightf(Gl.GL_LIGHT1, Gl.GL_SPOT_CUTOFF, 45f);
+
+
+            Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_AMBIENT, ambient);
+            Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_DIFFUSE, light_color);
+            //Gl.glLightf(Gl.GL_LIGHT2, Gl.GL_SPOT_CUTOFF, 10f);
+
+
+            //if (lights_enabled)
+            //{
+            //    Gl.glEnable(Gl.GL_LIGHT1);
+            //    Gl.glEnable(Gl.GL_LIGHT2);
+            //    //Gl.glEnable(Gl.GL_LIGHTING);
+            //}
+            //else
+            //{
+            //    Gl.glDisable(Gl.GL_LIGHT1);
+            //    Gl.glDisable(Gl.GL_LIGHT2);
+            //    //Gl.glDisable(Gl.GL_LIGHTING);
+            //}
+
+            //crtanje sijalica na pisti
+            //Gl.glColor3ub(light_red, light_green, light_blue);
+            float x_sijalice = 1.35f;
+            float y_sijalice = -.95f;
+
+            for (int i = 0; i < mf_sijalice.Count; i++)
+            {
+                Gl.glPushMatrix();
+                //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, moonPos);
+                //Gl.glTranslatef(moonPos[0], moonPos[1], moonPos[2]);
+                //Gl.glScalef(0.5f, 0.5f, 0.5f);
+                //Gl.glColor3ub(252, 252, 219); // bledo zuta boja
+                //Gl.glGetMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, emission);
+                //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, moonColor);
+
+                double daljina = Math.Floor((double)i / 2);
+
+                if (i % 2 == 0)
+                {
+
+                    {
+                        //float[] pos = { x_sijalice, y_sijalice, -(float)daljina, 1 };
+                        //Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_POSITION, pos);
+                        //Gl.glTranslatef(pos[0],pos[1],pos[2]);
+
+                        float[] posBall = { x_sijalice, y_sijalice, -(float)daljina, 1 };
+                        float[] posLight = { x_sijalice, y_sijalice + 0.1f, -(float)daljina, 1 };
+                        if (i == current_daljina)
+                        {
+                            //Gl.glLightfv(Gl.GL_LIGHT1, Gl.GL_POSITION, posLight);
+                        }
+                        Gl.glTranslatef(posBall[0], posBall[1], posBall[2]);
+                        //Gl.glColor3b((byte)light_color[0], (byte)light_color[1], (byte)light_color[2]);
+                        //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
+
+                    }
+
+                }
+                else
+                {
+                    float[] posBall = { -x_sijalice, y_sijalice, -(float)daljina, 1 };
+                    float[] posLight = { -x_sijalice, y_sijalice + 0.1f, -(float)daljina, 1 };
+                    if (i == current_daljina)
+                    {
+                        //Gl.glLightfv(Gl.GL_LIGHT2, Gl.GL_POSITION, posLight);
+                    }
+                    Gl.glTranslatef(posBall[0], posBall[1], posBall[2]);
+                    //Gl.glColor3b();
+                    //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
+                    //Gl.glTranslatef(-x_sijalice, y_sijalice, -(float)daljina);
+                }
+                if (current_daljina % 2 == 0)
+                {
+                    if (current_daljina == i || current_daljina + 1 == i)
+                    {
+                        Gl.glColor3ub(light_red, light_green, light_blue);
+                    }
+                    else
+                    {
+                        Gl.glColor3b(0, 0, 0);
+                    }
+                }
+                else {
+                    Gl.glColor3b(0, 0, 0);
+                }
+                
+                //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
+                Glu.gluSphere(mf_sijalice[i], 0.05f, 64, 64);
+
+                Gl.glPopMatrix();
+            }
+            if (lights_enabled)
+            {
+                current_daljina++;
+                if (current_daljina == 30)
+                {
+                    current_daljina = 0;
+                }
+            }
+            else {
+                //current_daljina = 0;
+                }
+
+
 
         }
 

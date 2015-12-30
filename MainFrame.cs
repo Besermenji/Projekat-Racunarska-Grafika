@@ -13,7 +13,7 @@ namespace Projekat
     public partial class MainFrame : Form
     {
         World world = null;
-
+        bool par = false;
 
         public MainFrame()
         {
@@ -190,6 +190,48 @@ namespace Projekat
                 this.Refresh();
                 //MessageBox.Show("RED: " + red);
             }
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightsInterval_ValueChanged(object sender, EventArgs e)
+        {
+            if (lightsInterval.Value == 0)
+            {
+                lightTimer.Enabled = false;
+                world.lights_enabled = false;
+            }
+            else {
+                lightTimer.Enabled = true;
+                lightTimer.Interval = (int)Math.Round(500 / lightsInterval.Value);
+                world.lights_enabled = true;
+            }
+        }
+
+        private void lightTimer_Tick(object sender, EventArgs e)
+        {
+            ////test da li radi tajmer
+            if (par)
+            {
+                world.lights_enabled = true;
+                //par = false;
+            }
+            else {
+                //par = true;
+                world.lights_enabled = false;
+            }
+
+            par = !par;
+            //Random r = new Random();
+            //world.light_red = (byte)r.Next(0, 255);
+            //world.light_blue = (byte)r.Next(0, 255);
+            //world.light_green = (byte)r.Next(0, 255);
+            this.Refresh();
+
+
         }
     }
 }
