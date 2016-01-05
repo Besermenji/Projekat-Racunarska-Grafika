@@ -1,9 +1,9 @@
 ﻿using RacunarskaGrafika.Vezbe;
-using RacunarskaGrafika.Vezbe.AssimpNetSample;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.ExceptionServices;
 using System.Windows.Forms;
 using Tao.OpenGl;
 
@@ -234,7 +234,7 @@ namespace Projekat
             //ukljucivanje svetla i normalizacije
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glEnable(Gl.GL_LIGHT0);
-            Gl.glEnable(Gl.GL_LIGHT3);
+            
             //Gl.glEnable(Gl.GL_LIGHT1);
             Gl.glEnable(Gl.GL_NORMALIZE);
 
@@ -401,7 +401,7 @@ namespace Projekat
                 Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_SPOT_CUTOFF, 180f);
                 //Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_SPOT_EXPONENT, 120f);
 
-
+                Gl.glEnable(Gl.GL_LIGHT3);
                 Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_POSITION, light_pos);
 
                 Gl.glTranslatef(light_pos[0],light_pos[1],light_pos[2]);
@@ -620,6 +620,7 @@ namespace Projekat
         /// <summary>
         ///  Korisnicko oslobadjanje OpenGL resursa.
         /// </summary>
+        [HandleProcessCorruptedStateExceptionsAttribute]
         private void Terminate()
         {
             // Oslobodi alocirane identifikatore DL liste i VBO objekta
@@ -629,8 +630,11 @@ namespace Projekat
             }
             Glu.gluDeleteQuadric(light_source);
             //Gl.glDeleteLists(m_treeDL, 1);
-            //Gl.glDeleteTextures(textureCount, textures);
-
+            try
+            {
+                Gl.glDeleteTextures(textureCount, textures);
+            }
+            catch { }
         }
 
         #endregion IDisposable metode
