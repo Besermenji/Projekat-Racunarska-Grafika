@@ -35,8 +35,11 @@
             this.label1 = new System.Windows.Forms.Label();
             this.lightsInterval = new System.Windows.Forms.NumericUpDown();
             this.lightTimer = new System.Windows.Forms.Timer(this.components);
+            this.label2 = new System.Windows.Forms.Label();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.lightGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lightsInterval)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // canvas
@@ -75,6 +78,8 @@
             // lightGroupBox
             // 
             this.lightGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lightGroupBox.Controls.Add(this.numericUpDown1);
+            this.lightGroupBox.Controls.Add(this.label2);
             this.lightGroupBox.Controls.Add(this.label1);
             this.lightGroupBox.Controls.Add(this.lightsInterval);
             this.lightGroupBox.Controls.Add(this.colorButton);
@@ -89,7 +94,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 66);
+            this.label1.Location = new System.Drawing.Point(3, 34);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(194, 13);
             this.label1.TabIndex = 3;
@@ -97,9 +102,9 @@
             // 
             // lightsInterval
             // 
-            this.lightsInterval.Location = new System.Drawing.Point(6, 82);
+            this.lightsInterval.Location = new System.Drawing.Point(6, 50);
             this.lightsInterval.Maximum = new decimal(new int[] {
-            20,
+            10,
             0,
             0,
             0});
@@ -111,7 +116,46 @@
             // 
             // lightTimer
             // 
-            lightTimer.Tick += new System.EventHandler(this.lightTimer_Tick);
+            this.lightTimer.Tick += new System.EventHandler(this.lightTimer_Tick);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 84);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(78, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Veličina sijalica";
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.DecimalPlaces = 2;
+            this.numericUpDown1.Increment = new decimal(new int[] {
+            2,
+            0,
+            0,
+            131072});
+            this.numericUpDown1.Location = new System.Drawing.Point(9, 101);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            131072});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.ReadOnly = true;
+            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDown1.TabIndex = 5;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // MainFrame
             // 
@@ -126,6 +170,7 @@
             this.lightGroupBox.ResumeLayout(false);
             this.lightGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lightsInterval)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -138,6 +183,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown lightsInterval;
         private System.Windows.Forms.Timer lightTimer;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label2;
     }
 }
 

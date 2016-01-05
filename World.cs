@@ -19,7 +19,9 @@ namespace Projekat
         //sijalica plavo
         public byte light_blue { get; set; }
 
-        public float current_daljina = 5;
+        public float current_daljina = 0;
+
+        public float light_diameter = 0.05f;
 
         /// <summary>
         ///	 Identifikatori OpenGL tekstura
@@ -176,7 +178,7 @@ namespace Projekat
 
         private void turnOnLights()
         {
-            float[] light_pos = { 0f, 3f, -14f, 1f };
+            float[] light_pos = { 0f, 5f, -14f, 1f };
             float[] light_color = { 0, 0, 0, 0 };
 
 
@@ -185,8 +187,8 @@ namespace Projekat
                 Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_POSITION, light_pos);
                 Gl.glTranslatef(light_pos[0], light_pos[1], light_pos[2]);
 
-                Glu.gluSphere(light_source, 0.5f, 64, 64);
-                Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
+                //Glu.gluSphere(light_source, 0.5f, 64, 64);
+                //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
 
             }
             Gl.glPopMatrix();
@@ -222,6 +224,7 @@ namespace Projekat
 
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_AMBIENT, ambient);
             Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_DIFFUSE, diffuse);
+            //Gl.glLightfv(Gl.GL_LIGHT0, Gl.GL_SPOT_DIRECTION, new float[] { 0, 1, 0 });
             //cut-off 30
             Gl.glLightf(Gl.GL_LIGHT0, Gl.GL_SPOT_CUTOFF, 30f);
 
@@ -231,6 +234,7 @@ namespace Projekat
             //ukljucivanje svetla i normalizacije
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glEnable(Gl.GL_LIGHT0);
+            Gl.glEnable(Gl.GL_LIGHT3);
             //Gl.glEnable(Gl.GL_LIGHT1);
             Gl.glEnable(Gl.GL_NORMALIZE);
 
@@ -294,12 +298,13 @@ namespace Projekat
             light_source = Glu.gluNewQuadric();
             Glu.gluQuadricNormals(light_source, Glu.GLU_SMOOTH);
 
-
+            Draw();
 
         }
 
         public void Draw()
         {
+            int envMode;
             Gl.glClear(16640);
             turnOnLights();
             Gl.glPushMatrix();
@@ -363,20 +368,55 @@ namespace Projekat
             Gl.glPushMatrix();
             {
                 //normale definisane u box klasi
+                //stapanje na gl_add
+                Gl.glGetTexEnviv(Gl.GL_TEXTURE_ENV, Gl.GL_TEXTURE_ENV_MODE, out envMode);
+                Gl.glTexEnvi(Gl.GL_TEXTURE_ENV, Gl.GL_TEXTURE_ENV_MODE, Gl.GL_ADD);
+
                 Gl.glBindTexture(Gl.GL_TEXTURE_2D, textures[(int)TextureObjects.Asphalt]);
                 Gl.glColor3ub(193, 193, 164);
                 Gl.glScalef(2.5f, 0.1f, 15f);
                 Gl.glTranslatef(0f, -9.1f, -0.5f);
                 mf_box.Draw();
-                //Gl.glDisable(Gl.GL_TEXTURE_2D);
+                // Vratiti rezim stapanja na prethodno stanje!
+                Gl.glTexEnvi(Gl.GL_TEXTURE_ENV, Gl.GL_TEXTURE_ENV_MODE, envMode);
+
             }
             Gl.glPopMatrix();
 
+            //crtanje svetla
             drawLights();
+
+            //crtanje svetla iznad aviona
+            Gl.glPushMatrix();
+            {
+
+
+                float[] ambient = { 0, 0, 0, 1 };
+                float[] light_color = { 0, 255, 0, 1 };
+                float[] light_pos = { -1.4f, 0f, -10f, 1 };
+                Gl.glScalef(0.1f, 0.1f, 0.1f);
+                //zeleni tackasti izvor
+                Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_AMBIENT, ambient);
+                Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_DIFFUSE, light_color);
+                Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_SPOT_CUTOFF, 180f);
+                //Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_SPOT_EXPONENT, 120f);
+
+
+                Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_POSITION, light_pos);
+
+                Gl.glTranslatef(light_pos[0],light_pos[1],light_pos[2]);
+
+                //Glu.gluSphere(light_source, 5f, 64, 64);
+                //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
+
+
+            }
+            Gl.glPopMatrix();
 
             //crtanje aviona
             Gl.glPushMatrix();
             {
+                
                 Gl.glScalef(0.1f, 0.1f, 0.1f);
                 Gl.glTranslatef(-1.4f, -8.5f, -10f);
                 Gl.glRotatef(-147f, 0, 1, 0);
@@ -441,16 +481,12 @@ namespace Projekat
         }
 
 
-        private void setupLightsLights()
-        {
-
-
-        }
+      
 
 
         private void drawLights()
         {
-
+            Gl.glDisable(Gl.GL_TEXTURE_2D);
             float[] ambient = { 0, 0, 0, 1 };
             float[] light_color = { light_red, light_green, light_blue, 1 };
 
@@ -544,7 +580,7 @@ namespace Projekat
                 }
                 
                 //Gl.glMaterialfv(Gl.GL_FRONT, Gl.GL_EMISSION, light_color);
-                Glu.gluSphere(mf_sijalice[i], 0.05f, 64, 64);
+                Glu.gluSphere(mf_sijalice[i], light_diameter, 64, 64);
 
                 Gl.glPopMatrix();
             }
@@ -559,7 +595,7 @@ namespace Projekat
             else {
                 //current_daljina = 0;
                 }
-
+            Gl.glEnable(Gl.GL_TEXTURE_2D);
 
 
         }

@@ -233,5 +233,11 @@ namespace Projekat
 
 
         }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            world.light_diameter = (float)numericUpDown1.Value;
+            this.Refresh();
+        }
     }
 }
