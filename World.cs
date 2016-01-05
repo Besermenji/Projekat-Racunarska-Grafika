@@ -399,6 +399,11 @@ namespace Projekat
                 Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_AMBIENT, ambient);
                 Gl.glLightfv(Gl.GL_LIGHT3, Gl.GL_DIFFUSE, light_color);
                 Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_SPOT_CUTOFF, 180f);
+
+                //malo slabljenja svetlosti da ne bode toliko oci
+                Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_CONSTANT_ATTENUATION, 100.0f);
+                Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_LINEAR_ATTENUATION, 50.0f);
+                Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_QUADRATIC_ATTENUATION, 1.5f);
                 //Gl.glLightf(Gl.GL_LIGHT3, Gl.GL_SPOT_EXPONENT, 120f);
 
                 Gl.glEnable(Gl.GL_LIGHT3);
